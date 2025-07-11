@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bryntum Calendar with Next.js quickstart
+
+This repository contains starter code to get you up and running with your Bryntum Calendar with Next.js project.
+
+## Requirements
+
+The Next.js starter code requires [Node.js 20](https://nodejs.org/) or higher.
+Bryntum Calendar requires React `16.0.0` or higher, and for applications written in TypeScript, TypeScript `3.6.0` or higher.
 
 ## Getting Started
 
-First, run the development server:
+Install the Next.js dependencies by running the following command:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```shell
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Installing the Bryntum Calendar component using npm is the quickest way to use our products. First, get access to the Bryntum private npm registry by following the [guide in our docs](https://bryntum.com/products/calendar/docs/guide/Calendar/npm-repository). Once you’ve logged into the registry, install the Bryntum Calendar component.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If you have a Bryntum license, use the following command:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```shell
+npm install @bryntum/calendar @bryntum/calendar-react
+```
 
-## Learn More
+If you are trying out our component, install the trial version:
 
-To learn more about Next.js, take a look at the following resources:
+```shell
+npm install @bryntum/calendar@npm:@bryntum/calendar-trial @bryntum/calendar-react
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Run the application
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run the local development server:
 
-## Deploy on Vercel
+```shell
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+You'll see your Bryntum Calendar app at the following URL: [http://localhost:3000](http://localhost:3000/).

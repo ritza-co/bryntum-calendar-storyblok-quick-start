@@ -1,6 +1,10 @@
-body,
-html {
+* {
+  box-sizing: border-box;
+  padding: 0;
   margin: 0;
+}
+
+#b-calendar-1 {
   display: flex;
   flex-direction: column;
   height: 100vh;

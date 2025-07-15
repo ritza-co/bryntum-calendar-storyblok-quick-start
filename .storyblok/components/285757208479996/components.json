@@ -1,0 +1,249 @@
+[
+  {
+    "name": "calendar",
+    "display_name": null,
+    "description": "",
+    "created_at": "2025-07-14T10:14:09.317Z",
+    "updated_at": "2025-07-14T10:24:10.167Z",
+    "id": 68806448410516,
+    "schema": {
+      "resources": {
+        "type": "bloks",
+        "pos": 0,
+        "id": "ii5N4cTvQDe-vJ_Ca5AHcQ"
+      },
+      "events": {
+        "type": "bloks",
+        "pos": 1,
+        "id": "K28BcHW1SlaHDvLZpoa0lA"
+      }
+    },
+    "image": null,
+    "preview_field": null,
+    "is_root": true,
+    "preview_tmpl": null,
+    "is_nestable": true,
+    "all_presets": [],
+    "preset_id": null,
+    "real_name": "calendar",
+    "component_group_uuid": null,
+    "color": null,
+    "icon": null,
+    "internal_tags_list": [],
+    "internal_tag_ids": [],
+    "content_type_asset_preview": null,
+    "metadata": {}
+  },
+  {
+    "name": "event",
+    "display_name": null,
+    "description": "",
+    "created_at": "2025-07-14T09:55:31.535Z",
+    "updated_at": "2025-07-15T11:21:21.622Z",
+    "id": 68801869975258,
+    "schema": {
+      "id": {
+        "type": "number",
+        "pos": 0,
+        "id": "beFOu7kaQYCLhLPOyU-tZg"
+      },
+      "name": {
+        "type": "text",
+        "pos": 1,
+        "id": "-1_jYbLDQ7SxUFGqxtH_mA"
+      },
+      "readOnly": {
+        "type": "boolean",
+        "pos": 2,
+        "id": "TjurivJESA6s8u5XBQsqFA"
+      },
+      "resourceId": {
+        "type": "text",
+        "pos": 3,
+        "id": "N_i0Kn-dTt6v4lVDFyrXMQ"
+      },
+      "draggable": {
+        "type": "boolean",
+        "pos": 5,
+        "id": "puiSnqyuQvuKf3h0wrUf6A",
+        "default_value": true
+      },
+      "resizable": {
+        "type": "boolean",
+        "pos": 6,
+        "id": "heqeWRCYQTmB6tEU6Xo--w",
+        "default_value": true
+      },
+      "allDay": {
+        "type": "boolean",
+        "pos": 7,
+        "id": "mNCs0_yzS72T5t3hy9S3Rg"
+      },
+      "startDate": {
+        "type": "datetime",
+        "pos": 10,
+        "id": "y1o3co7hRhmR0XneN4v11w"
+      },
+      "endDate": {
+        "type": "datetime",
+        "pos": 11,
+        "id": "ojp1jHlRRbCm_Bi6kyOdbw"
+      },
+      "exceptionDates": {
+        "type": "text",
+        "pos": 12,
+        "id": "1wNdFV-NQUu4DUgqsAtr7A"
+      },
+      "recurrenceRule": {
+        "type": "text",
+        "pos": 13,
+        "id": "J77Ep-CDRjCCHyfEkaY_KA"
+      },
+      "cls": {
+        "type": "text",
+        "pos": 14,
+        "id": "3dkmnfGCS8OUVjweYi53Dw"
+      },
+      "eventColor": {
+        "type": "text",
+        "pos": 15,
+        "id": "K5Elua9QSruy-TGE_sioBA"
+      },
+      "eventStyle": {
+        "type": "text",
+        "pos": 16,
+        "id": "ftYgVlHeQ8OkvTjdceLSEA"
+      },
+      "iconCls": {
+        "type": "text",
+        "pos": 17,
+        "id": "l1b8MsPjQj6szcUEv1pN_w"
+      },
+      "style": {
+        "type": "text",
+        "pos": 18,
+        "id": "l-9w_ZRBQGS_eACRlQC4oA"
+      }
+    },
+    "image": null,
+    "preview_field": null,
+    "is_root": false,
+    "preview_tmpl": null,
+    "is_nestable": true,
+    "all_presets": [],
+    "preset_id": null,
+    "real_name": "event",
+    "component_group_uuid": null,
+    "color": null,
+    "icon": null,
+    "internal_tags_list": [],
+    "internal_tag_ids": [],
+    "content_type_asset_preview": null,
+    "metadata": {}
+  },
+  {
+    "name": "header",
+    "display_name": null,
+    "description": "",
+    "created_at": "2025-07-13T15:36:08.283Z",
+    "updated_at": "2025-07-13T15:37:28.697Z",
+    "id": 68531684492670,
+    "schema": {
+      "title": {
+        "type": "text",
+        "pos": 0,
+        "id": "fVe8h6ipQo2_5Fq1sYiR6Q"
+      }
+    },
+    "image": null,
+    "preview_field": null,
+    "is_root": false,
+    "preview_tmpl": null,
+    "is_nestable": true,
+    "all_presets": [],
+    "preset_id": null,
+    "real_name": "header",
+    "component_group_uuid": null,
+    "color": null,
+    "icon": null,
+    "internal_tags_list": [],
+    "internal_tag_ids": [],
+    "content_type_asset_preview": null,
+    "metadata": {}
+  },
+  {
+    "name": "page",
+    "display_name": null,
+    "description": null,
+    "created_at": "2025-07-13T14:31:07.857Z",
+    "updated_at": "2025-07-13T14:31:07.857Z",
+    "id": 68515708347714,
+    "schema": {
+      "body": {
+        "type": "bloks",
+        "id": "dC224oaySB2zch4i0mgqvA"
+      }
+    },
+    "image": null,
+    "preview_field": null,
+    "is_root": true,
+    "preview_tmpl": null,
+    "is_nestable": false,
+    "all_presets": [],
+    "preset_id": null,
+    "real_name": "page",
+    "component_group_uuid": null,
+    "color": null,
+    "icon": null,
+    "internal_tags_list": [],
+    "internal_tag_ids": [],
+    "content_type_asset_preview": null,
+    "metadata": {}
+  },
+  {
+    "name": "resource",
+    "display_name": null,
+    "description": "",
+    "created_at": "2025-07-14T09:18:34.762Z",
+    "updated_at": "2025-07-14T10:19:21.982Z",
+    "id": 68792790072811,
+    "schema": {
+      "id": {
+        "type": "text",
+        "pos": 0,
+        "id": "cb8xsZymTzKpTn8KgFvv9Q"
+      },
+      "name": {
+        "type": "text",
+        "pos": 1,
+        "id": "7SewwoTwSXy1QEpKPkpTCQ"
+      },
+      "eventColor": {
+        "type": "text",
+        "pos": 2,
+        "id": "Gj_B5xW_RW-dLQ7ygrQqIg"
+      },
+      "readOnly": {
+        "type": "boolean",
+        "pos": 3,
+        "id": "TjukOwigTN-CWpmpwGs52g",
+        "default_value": false
+      }
+    },
+    "image": null,
+    "preview_field": null,
+    "is_root": false,
+    "preview_tmpl": null,
+    "is_nestable": true,
+    "all_presets": [],
+    "preset_id": null,
+    "real_name": "resource",
+    "component_group_uuid": null,
+    "color": null,
+    "icon": null,
+    "internal_tags_list": [],
+    "internal_tag_ids": [],
+    "content_type_asset_preview": null,
+    "metadata": {}
+  }
+]

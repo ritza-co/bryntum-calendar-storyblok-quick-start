@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
+import StoryblokProvider from './components/StoryblokProvider';
+import StoryDataProvider from './contexts/StoryData.context';
 import './globals.css';
 
 const poppins = Poppins({
@@ -19,10 +21,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={poppins.className}>
-            <body>
-                {children}
-            </body>
-        </html>
+        <StoryblokProvider>
+            <StoryDataProvider>
+                <html lang="en" className={poppins.className}>
+                    <body>
+                        {children}
+                    </body>
+                </html>
+            </StoryDataProvider>
+        </StoryblokProvider>
     );
 }

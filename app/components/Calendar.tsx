@@ -1,55 +1,60 @@
 'use client';
 
-import { EventModel, ResourceModel } from '@bryntum/calendar';
+import { Event, Page, Resource } from '@/.storyblok/types/storyblok-components';
+import { Model, ProjectConsumer, ProjectModelMixin, Store, Toast } from '@bryntum/calendar';
 import { BryntumCalendar } from '@bryntum/calendar-react';
-import { ISbStoryData } from '@storyblok/react';
+import '@bryntum/calendar/calendar.stockholm.css';
 import { useContext, useEffect, useRef } from 'react';
-import { ISbComponentType } from 'storyblok-js-client';
-import { StoryDataContext } from '../contexts/StoryData.context';
+import { calendarProps } from '../calendarConfig';
+import { Story, StoryDataContext } from '../contexts/StoryData.context';
 import { convertDateToSbFormat } from '../helpers';
+import { CustomEventModelType } from '../lib/CustomEventModel';
+import { CustomResourceModelType } from '../lib/CustomResourceModel';
 
-type SyncData = {
-    store: {
-      id: 'events' | 'resources';
-    };
-    action: 'dataset' | 'add' | 'remove' | 'update';
-    record: EventModel | ResourceModel;
-    records: (EventModel | ResourceModel)[];
-    changes: { [key: string]: any };
-  };
+type SyncData = ((event: {
+    source: typeof ProjectConsumer;
+    project: typeof ProjectModelMixin;
+    store: Store;
+    action: 'remove' | 'removeAll' | 'add' | 'clearchanges' | 'filter' | 'update' | 'dataset' | 'replace';
+    record: Model | CustomEventModelType | CustomResourceModelType;
+    records: Model[] | CustomEventModelType[] | CustomResourceModelType[];
+    changes: object;
+}) => void) | string
 
-  type Story = ISbStoryData<
-    ISbComponentType<string> & {
-      [index: string]: any;
-    }
-  >;
+type UpdatedStory = {
+    story: Story;
+}
 
-export default function Calendar({ ...props }) {
+export default function Calendar() {
     const { storyData, setStoryData } = useContext(StoryDataContext);
-
-    const currCalendarComponentIndex = storyData?.content?.body.findIndex(
-        (item: any) => item.hasOwnProperty('events')
+    const currCalendarComponentIndex = storyData?.content?.body?.findIndex(
+        (item) => item.hasOwnProperty('events')
     );
     const calendarRef = useRef<BryntumCalendar>(null);
 
-    function updateStory(updatedStory: any) {
-        const currCalendarComponentIndex = storyData?.content?.body.findIndex(
-            (item: any) => item.hasOwnProperty('events')
+    function updateStory(updatedStory: UpdatedStory) {
+        delete updatedStory.story.content._editable;
+
+        const currCalendarComponentIndex = storyData?.content?.body?.findIndex(
+            (item) => item.hasOwnProperty('events')
         );
 
-        // Remove _editable property from events and resources
-        if (updatedStory.story.content.body[currCalendarComponentIndex].events) {
+        if (!currCalendarComponentIndex) return;
+        updatedStory.story.content.body?.map((item) => {
+            delete item._editable;
+        });
+        if (updatedStory.story.content.body?.[currCalendarComponentIndex]?.events) {
             updatedStory.story.content.body[currCalendarComponentIndex].events =
-            updatedStory.story.content.body[currCalendarComponentIndex].events.map((event: EventModel) => {
-                const { _editable, ...rest } = event;
-                return rest;
+            (updatedStory.story.content.body[currCalendarComponentIndex].events as CustomEventModelType[]).map((event: CustomEventModelType) => {
+                delete event._editable;
+                return event;
             });
         }
-        if (updatedStory.story.content.body[currCalendarComponentIndex].resources) {
+        if (updatedStory?.story?.content?.body?.[currCalendarComponentIndex]?.resources) {
             updatedStory.story.content.body[currCalendarComponentIndex].resources =
-            updatedStory.story.content.body[currCalendarComponentIndex].resources.map((resource: ResourceModel) => {
-                const { _editable, ...rest } = resource;
-                return rest;
+            (updatedStory.story.content.body[currCalendarComponentIndex].resources as CustomResourceModelType[]).map((resource: CustomResourceModelType) => {
+                delete resource._editable;
+                return resource;
             });
         }
         fetch('/api/update', {
@@ -61,35 +66,45 @@ export default function Calendar({ ...props }) {
         })
             .then((response) => response.json())
             .then((data) => {
+
+                // Handle conflict response
+                if (data.conflict) {
+                    Toast.show({
+                        html    : 'Content conflict detected. Please click the <b>Save</b> button in the Storyblok Visual Editor to resolve.',
+                        side    : 'bottom',
+                        timeout : 10000
+                    });
+                    return; // Exit early to prevent error
+                }
+
                 const newCalendarComponentIndex = data.story.content?.body.findIndex(
-                    (item: any) => item.hasOwnProperty('events')
+                    (item: Page) => item.hasOwnProperty('events')
                 );
 
-                if (
-                    JSON.stringify(
-                        updatedStory.story.content.body[currCalendarComponentIndex].events
-                    ) !==
+                if (JSON.stringify(
+                    updatedStory?.story?.content?.body?.[currCalendarComponentIndex]?.events
+                ) !==
               JSON.stringify(data.story.content.body[newCalendarComponentIndex].events) ||
               JSON.stringify(
-                  updatedStory.story.content.body[currCalendarComponentIndex].resources
+                  updatedStory?.story?.content?.body?.[currCalendarComponentIndex]?.resources
               ) !==
               JSON.stringify(data.story.content.body[newCalendarComponentIndex].resources)
                 ) {
                     if (data.story.content.body[newCalendarComponentIndex].events) {
                         data.story.content.body[newCalendarComponentIndex].events =
                   data.story.content.body[newCalendarComponentIndex].events.map(
-                      (event: EventModel) => {
-                          const { _editable, ...rest } = event;
-                          return rest;
+                      (event: CustomEventModelType) => {
+                          delete event._editable;
+                          return event;
                       }
                   );
                     }
                     if (data.story.content.body[newCalendarComponentIndex].resources) {
                         data.story.content.body[newCalendarComponentIndex].resources =
                   data.story.content.body[newCalendarComponentIndex].resources.map(
-                      (resource: ResourceModel) => {
-                          const { _editable, ...rest } = resource;
-                          return rest;
+                      (resource: CustomResourceModelType) => {
+                          delete resource._editable;
+                          return resource;
                       }
                   );
                     }
@@ -101,18 +116,22 @@ export default function Calendar({ ...props }) {
             });
     }
 
-    const syncData = ({ store, action, record, records, changes }: SyncData) => {
+    const syncData: SyncData = ({ store, action, record, records }) => {
         const storeId = store.id;
 
         if (storeId === 'events') {
+            const eventRecord = record as CustomEventModelType;
+
             if (action === 'remove') {
-                const storyDataState = JSON.parse(JSON.stringify(storyData));
+                const storyDataState: Story = JSON.parse(JSON.stringify(storyData));
                 const content = storyDataState.content;
-                const updatedContent = content.body.map((item: any) => {
+                const updatedContent = content?.body?.map((item) => {
                     if (item.component === 'calendar') {
-                        item.events = item.events.filter(
-                            (event: EventModel) => event.id !== record.id
-                        );
+                        records.forEach((evt) => {
+                            item.events = item.events?.filter(
+                                (event) => event.id !== evt.id
+                            );
+                        });
                     }
                     return item;
                 });
@@ -129,42 +148,44 @@ export default function Calendar({ ...props }) {
             }
 
             if (action === 'update') {
-                const storyDataState = JSON.parse(JSON.stringify(storyData));
+                const storyDataState: Story = JSON.parse(JSON.stringify(storyData));
                 const content = storyDataState.content;
-                const updatedContent = content.body.map((item: any) => {
+                const updatedContent = content.body?.map((item) => {
                     if (item.component === 'calendar') {
-                        const existingEventIndex = item.events.findIndex(
-                            (event: EventModel) => event.id === record.id
+                        const existingEventIndex = item.events?.findIndex(
+                            (event) => event.id === eventRecord.id
                         );
 
+                        if (!existingEventIndex) return item;
+
                         const eventData = {
-                            id             : record.id,
-                            _uid           : record._uid || crypto.randomUUID(),
-                            name           : record.name,
-                            startDate      : convertDateToSbFormat(`${record.startDate}`),
-                            endDate        : convertDateToSbFormat(`${record.endDate}`),
+                            id             : existingEventIndex >= 0 ? eventRecord.id : crypto.randomUUID(),
+                            _uid           : existingEventIndex >= 0 ? eventRecord.get('_uid') : crypto.randomUUID(),
+                            name           : eventRecord.name,
+                            startDate      : convertDateToSbFormat(`${eventRecord.startDate}`),
+                            endDate        : convertDateToSbFormat(`${eventRecord.endDate}`),
                             component      : 'event',
-                            resourceId     : record.resourceId,
-                            readOnly       : record.readOnly || false,
-                            draggable      : record.draggable !== false,
-                            resizable      : record.resizable !== false,
-                            allDay         : record.allDay || false,
-                            exceptionDates : record.exceptionDates,
-                            recurrenceRule : record.recurrenceRule,
-                            cls            : record.cls,
-                            eventColor     : record.eventColor,
-                            eventStyle     : record.eventStyle,
-                            iconCls        : record.iconCls,
-                            style          : record.style
+                            resourceId     : eventRecord.resourceId,
+                            readOnly       : eventRecord.readOnly || false,
+                            draggable      : eventRecord.draggable !== false,
+                            resizable      : eventRecord.resizable !== false,
+                            allDay         : eventRecord.allDay || false,
+                            exceptionDates : eventRecord.exceptionDates,
+                            recurrenceRule : eventRecord.recurrenceRule,
+                            cls            : eventRecord.cls,
+                            eventColor     : eventRecord.eventColor,
+                            eventStyle     : eventRecord.eventStyle,
+                            iconCls        : eventRecord.iconCls,
+                            style          : eventRecord.style
                         };
 
-                        if (existingEventIndex >= 0) {
+                        if (item.events && existingEventIndex >= 0) {
                             // Update existing event
-                            item.events[existingEventIndex] = eventData;
+                            item.events[existingEventIndex] = eventData as Event;
                         }
                         else {
                             // Create new event (first update after add)
-                            item.events.push(eventData);
+                            item.events?.push(eventData as Event);
                         }
                     }
                     return item;
@@ -184,14 +205,18 @@ export default function Calendar({ ...props }) {
         }
 
         if (storeId === 'resources') {
+            const resourceRecord = record as CustomResourceModelType;
+
             if (action === 'remove') {
-                const storyDataState = JSON.parse(JSON.stringify(storyData));
+                const storyDataState: Story = JSON.parse(JSON.stringify(storyData));
                 const content = storyDataState.content;
-                const updatedContent = content.body.map((item: any) => {
+                const updatedContent = content?.body?.map((item) => {
                     if (item.component === 'calendar') {
-                        item.resources = item.resources.filter(
-                            (resource: ResourceModel) => resource.id !== record.id
-                        );
+                        records.forEach((res) => {
+                            item.resources = item.resources?.filter(
+                                (resource) => resource.id !== res.id
+                            );
+                        });
                     }
                     return item;
                 });
@@ -208,30 +233,30 @@ export default function Calendar({ ...props }) {
             }
 
             if (action === 'update') {
-                const storyDataState = JSON.parse(JSON.stringify(storyData));
+                const storyDataState: Story = JSON.parse(JSON.stringify(storyData));
                 const content = storyDataState.content;
-                const updatedContent = content.body.map((item: any) => {
+                const updatedContent = content?.body?.map((item) => {
                     if (item.component === 'calendar') {
-                        const existingResourceIndex = item.resources.findIndex(
-                            (resource: ResourceModel) => resource.id === record.id
+                        const existingResourceIndex = item.resources?.findIndex(
+                            (resource) => resource.id === resourceRecord.id
                         );
 
                         const resourceData = {
-                            id         : record.id,
-                            _uid       : record._uid || crypto.randomUUID(),
-                            name       : record.name,
-                            eventColor : record.eventColor,
-                            readOnly   : record.readOnly || false,
+                            id         : resourceRecord.id,
+                            _uid       : resourceRecord.get('_uid') || crypto.randomUUID(),
+                            name       : resourceRecord.name,
+                            eventColor : resourceRecord.eventColor,
+                            readOnly   : resourceRecord.readOnly || false,
                             component  : 'resource'
                         };
 
-                        if (existingResourceIndex >= 0) {
+                        if (item.resources && existingResourceIndex && existingResourceIndex >= 0) {
                             // Update existing resource
-                            item.resources[existingResourceIndex] = resourceData;
+                            item.resources[existingResourceIndex] = resourceData as Resource;
                         }
                         else {
                             // Create new resource (first update after add)
-                            item.resources.push(resourceData);
+                            item.resources?.push(resourceData as Resource);
                         }
                     }
                     return item;
@@ -259,10 +284,10 @@ export default function Calendar({ ...props }) {
     return (
         <BryntumCalendar
             ref={calendarRef}
-            events={storyData?.content?.body[currCalendarComponentIndex]?.events}
-            resources={storyData?.content?.body[currCalendarComponentIndex]?.resources}
+            events={currCalendarComponentIndex !== undefined ? (storyData?.content?.body?.[currCalendarComponentIndex]?.events as CustomEventModelType[]) || [] : []}
+            resources={currCalendarComponentIndex !== undefined ? (storyData?.content?.body?.[currCalendarComponentIndex]?.resources as CustomResourceModelType[]) || [] : []}
             onDataChange={syncData}
-            {...props}
+            {...calendarProps}
         />
     );
 }

@@ -1,4 +1,4 @@
-import { Page as PageType } from '@/.storyblok/types/285757208479996/storyblok-components';
+import { Page as PageType } from '@/.storyblok/types/storyblok-components';
 import { SbBlokData, StoryblokComponent, storyblokEditable } from '@storyblok/react';
 
 const Page = ({ blok }: { blok: PageType & SbBlokData }) => {

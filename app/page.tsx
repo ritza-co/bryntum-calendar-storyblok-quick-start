@@ -1,8 +1,9 @@
 'use client';
-import '@bryntum/calendar/calendar.stockholm.css';
+
+import { Page } from '@/.storyblok/types/storyblok-components';
 import { StoryblokComponent, useStoryblok } from '@storyblok/react';
 import { useContext, useEffect } from 'react';
-import { StoryDataContext } from './contexts/StoryData.context';
+import { Story, StoryDataContext } from './contexts/StoryData.context';
 
 export default function Home() {
     const story = useStoryblok('/home', { version : 'draft' });
@@ -10,18 +11,20 @@ export default function Home() {
     useEffect(() => {
         if (!story?.content) return;
 
-        const transformedStory = {
+        const transformedStory: Story = {
             ...story,
             content : {
                 ...story.content,
-                body : story.content.body?.map(block => {
+                component : 'page',
+                _uid      : story.content._uid || '',
+                body      : story.content.body?.map((block: Page) => {
                     if (block.events) {
                         return {
                             ...block,
-                            events : block.events.map(event => {
+                            events : (block.events as Event[]).map((event: Event) => {
                                 // Filter out empty string fields
                                 return Object.fromEntries(
-                                    Object.entries(event).filter(([key, value]) => value !== '')
+                                    Object.entries(event).filter(([, value]) => value !== '')
                                 );
                             })
                         };

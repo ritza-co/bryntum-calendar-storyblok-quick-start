@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { calendarProps } from '../calendarConfig';
 
 const Calendar = dynamic(() => import('./Calendar'), {
     ssr     : false,
@@ -22,6 +21,7 @@ const Calendar = dynamic(() => import('./Calendar'), {
 });
 
 const CalendarWrapper = () => {
-    return <Calendar {...calendarProps} />;
+    return <Calendar />;
 };
+
 export { CalendarWrapper };

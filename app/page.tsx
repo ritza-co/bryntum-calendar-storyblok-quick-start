@@ -4,6 +4,7 @@ import { Page } from '@/.storyblok/types/storyblok-components';
 import { StoryblokComponent, useStoryblok } from '@storyblok/react';
 import { useContext, useEffect } from 'react';
 import { Story, StoryDataContext } from './contexts/StoryData.context';
+import { CustomEventModel } from './lib/CustomEventModel';
 
 export default function Home() {
     const story = useStoryblok('/home', { version : 'draft' });
@@ -21,8 +22,14 @@ export default function Home() {
                     if (block.events) {
                         return {
                             ...block,
-                            events : (block.events as Event[]).map((event: Event) => {
-                                // Filter out empty string fields
+                            events : (block.events as CustomEventModel[]).map((event: CustomEventModel) => {
+                                console.log(event.exceptionDates);
+                                event.exceptionDates = event?.exceptionDates ?
+                                    (typeof event.exceptionDates === 'string' ?
+                                        Object.keys(JSON.parse(event.exceptionDates)) :
+                                        event.exceptionDates) :
+                                    [];
+                                // // Filter out empty string fields
                                 return Object.fromEntries(
                                     Object.entries(event).filter(([, value]) => value !== '')
                                 );

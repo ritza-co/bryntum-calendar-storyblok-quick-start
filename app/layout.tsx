@@ -1,3 +1,4 @@
+import '@bryntum/calendar/calendar.stockholm.css';
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import StoryblokProvider from './components/StoryblokProvider';

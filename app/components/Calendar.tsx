@@ -3,7 +3,6 @@
 import { Event, Page, Resource } from '@/.storyblok/types/storyblok-components';
 import { Model, ProjectConsumer, ProjectModelMixin, Store, Toast } from '@bryntum/calendar';
 import { BryntumCalendar } from '@bryntum/calendar-react';
-import '@bryntum/calendar/calendar.stockholm.css';
 import { useContext, useEffect, useRef } from 'react';
 import { calendarProps } from '../calendarConfig';
 import { Story, StoryDataContext } from '../contexts/StoryData.context';
@@ -170,7 +169,7 @@ export default function Calendar() {
                             draggable      : eventRecord.draggable !== false,
                             resizable      : eventRecord.resizable !== false,
                             allDay         : eventRecord.allDay || false,
-                            exceptionDates : eventRecord.exceptionDates,
+                            exceptionDates : eventRecord.exceptionDates ? JSON.stringify(eventRecord.exceptionDates) : undefined,
                             recurrenceRule : eventRecord.recurrenceRule,
                             cls            : eventRecord.cls,
                             eventColor     : eventRecord.eventColor,

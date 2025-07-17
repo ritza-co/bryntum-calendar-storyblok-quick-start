@@ -23,7 +23,6 @@ export default function Home() {
                         return {
                             ...block,
                             events : (block.events as CustomEventModel[]).map((event: CustomEventModel) => {
-                                console.log(event.exceptionDates);
                                 event.exceptionDates = event?.exceptionDates ?
                                     (typeof event.exceptionDates === 'string' ?
                                         Object.keys(JSON.parse(event.exceptionDates)) :

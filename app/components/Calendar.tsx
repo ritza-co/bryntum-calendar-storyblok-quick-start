@@ -9,6 +9,7 @@ import { Story, StoryDataContext } from '../contexts/StoryData.context';
 import { convertDateToSbFormat } from '../helpers';
 import { CustomEventModelType } from '../lib/CustomEventModel';
 import { CustomResourceModelType } from '../lib/CustomResourceModel';
+import { debounce } from '../utils';
 
 type SyncData = ((event: {
     source: typeof ProjectConsumer;
@@ -115,6 +116,10 @@ export default function Calendar() {
             });
     }
 
+    const debouncedFetch = debounce((updatedStory: UpdatedStory) => {
+        updateStory(updatedStory);
+    }, 1000);
+
     const syncData: SyncData = ({ store, action, record, records }) => {
         const storeId = store.id;
 
@@ -143,7 +148,7 @@ export default function Calendar() {
                         }
                     }
                 };
-                updateStory(updatedStory);
+                debouncedFetch(updatedStory);
             }
 
             if (action === 'update') {
@@ -199,7 +204,7 @@ export default function Calendar() {
                         }
                     }
                 };
-                updateStory(updatedStory);
+                debouncedFetch(updatedStory);
             }
         }
 
@@ -228,7 +233,7 @@ export default function Calendar() {
                         }
                     }
                 };
-                updateStory(updatedStory);
+                debouncedFetch(updatedStory);
             }
 
             if (action === 'update') {
@@ -270,7 +275,7 @@ export default function Calendar() {
                         }
                     }
                 };
-                updateStory(updatedStory);
+                debouncedFetch(updatedStory);
             }
         }
     };

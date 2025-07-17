@@ -1,7 +1,6 @@
 'use client';
 
 import { BryntumCalendar } from '@bryntum/calendar-react';
-import '@bryntum/calendar/calendar.stockholm.css';
 import { useEffect, useRef } from 'react';
 import { calendarProps } from '../calendarConfig';
 

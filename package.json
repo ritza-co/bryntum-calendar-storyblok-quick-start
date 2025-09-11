@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "pull-sb-components": "storyblok components pull --space 285757208479996",
-    "generate-sb-types": "storyblok types generate --space 285757208479996"
+    "pull-sb-components": "storyblok components pull --space 287039899658068",
+    "generate-sb-types": "storyblok types generate --space 287039899658068"
   },
   "dependencies": {
     "@bryntum/calendar": "^6.2.5",

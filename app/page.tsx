@@ -7,8 +7,9 @@ import { Story, StoryDataContext } from './contexts/StoryData.context';
 import { CustomEventModel } from './lib/CustomEventModel';
 
 export default function Home() {
-    const story = useStoryblok('/home', { version : 'draft' });
-    const { setStoryData } = useContext(StoryDataContext);
+    const { setStoryData, cacheKey } = useContext(StoryDataContext);
+    const story = useStoryblok('/home', { version : 'draft', cv : cacheKey });
+
     useEffect(() => {
         if (!story?.content) return;
 
@@ -28,7 +29,7 @@ export default function Home() {
                                         Object.keys(JSON.parse(event.exceptionDates)) :
                                         event.exceptionDates) :
                                     [];
-                                // // Filter out empty string fields
+                                // Filter out empty string fields
                                 return Object.fromEntries(
                                     Object.entries(event).filter(([, value]) => value !== '')
                                 );

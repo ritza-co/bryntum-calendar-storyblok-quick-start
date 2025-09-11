@@ -1,7 +1,7 @@
 'use client';
 
-import { Event, Page, Resource } from '@/.storyblok/types/storyblok-components';
-import { Model, ProjectConsumer, ProjectModelMixin, Store, Toast } from '@bryntum/calendar';
+import { Event, Resource } from '@/.storyblok/types/storyblok-components';
+import { Model, ProjectConsumer, ProjectModelMixin, Store } from '@bryntum/calendar';
 import { BryntumCalendar } from '@bryntum/calendar-react';
 import { useContext, useEffect, useRef } from 'react';
 import { calendarProps } from '../calendarConfig';
@@ -9,7 +9,6 @@ import { Story, StoryDataContext } from '../contexts/StoryData.context';
 import { convertDateToSbFormat } from '../helpers';
 import { CustomEventModelType } from '../lib/CustomEventModel';
 import { CustomResourceModelType } from '../lib/CustomResourceModel';
-import { debounce } from '../utils';
 
 type SyncData = ((event: {
     source: typeof ProjectConsumer;
@@ -26,7 +25,7 @@ type UpdatedStory = {
 }
 
 export default function Calendar() {
-    const { storyData, setStoryData } = useContext(StoryDataContext);
+    const { storyData, refreshStory } = useContext(StoryDataContext);
     const currCalendarComponentIndex = storyData?.content?.body?.findIndex(
         (item) => item.hasOwnProperty('events')
     );
@@ -65,60 +64,13 @@ export default function Calendar() {
             body : JSON.stringify(updatedStory)
         })
             .then((response) => response.json())
-            .then((data) => {
-
-                // Handle conflict response
-                if (data.conflict) {
-                    Toast.show({
-                        html    : 'Content conflict detected. Please click the <b>Save</b> button in the Storyblok Visual Editor to resolve.',
-                        side    : 'bottom',
-                        timeout : 10000
-                    });
-                    return; // Exit early to prevent error
-                }
-
-                const newCalendarComponentIndex = data.story.content?.body.findIndex(
-                    (item: Page) => item.hasOwnProperty('events')
-                );
-
-                if (JSON.stringify(
-                    updatedStory?.story?.content?.body?.[currCalendarComponentIndex]?.events
-                ) !==
-              JSON.stringify(data.story.content.body[newCalendarComponentIndex].events) ||
-              JSON.stringify(
-                  updatedStory?.story?.content?.body?.[currCalendarComponentIndex]?.resources
-              ) !==
-              JSON.stringify(data.story.content.body[newCalendarComponentIndex].resources)
-                ) {
-                    if (data.story.content.body[newCalendarComponentIndex].events) {
-                        data.story.content.body[newCalendarComponentIndex].events =
-                  data.story.content.body[newCalendarComponentIndex].events.map(
-                      (event: CustomEventModelType) => {
-                          delete event._editable;
-                          return event;
-                      }
-                  );
-                    }
-                    if (data.story.content.body[newCalendarComponentIndex].resources) {
-                        data.story.content.body[newCalendarComponentIndex].resources =
-                  data.story.content.body[newCalendarComponentIndex].resources.map(
-                      (resource: CustomResourceModelType) => {
-                          delete resource._editable;
-                          return resource;
-                      }
-                  );
-                    }
-                    setStoryData(JSON.parse(JSON.stringify(data.story)));
-                }
+            .then(() => {
+                refreshStory();
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
     }
-
-    const debouncedFetch = debounce((updatedStory: UpdatedStory) => {
-        updateStory(updatedStory);
-    }, 1000);
 
     const syncData: SyncData = ({ store, action, record, records }) => {
         const storeId = store.id;
@@ -148,7 +100,7 @@ export default function Calendar() {
                         }
                     }
                 };
-                debouncedFetch(updatedStory);
+                updateStory(updatedStory);
             }
 
             if (action === 'update') {
@@ -158,9 +110,9 @@ export default function Calendar() {
                     if (item.component === 'calendar') {
                         const existingEventIndex = item.events?.findIndex(
                             (event) => event.id === eventRecord.id
-                        );
+                        ) ?? -1;
 
-                        if (!existingEventIndex) return item;
+                        if (existingEventIndex === -1) return item;
 
                         const eventData = {
                             id             : existingEventIndex >= 0 ? eventRecord.id : crypto.randomUUID(),
@@ -204,7 +156,7 @@ export default function Calendar() {
                         }
                     }
                 };
-                debouncedFetch(updatedStory);
+                updateStory(updatedStory);
             }
         }
 
@@ -233,7 +185,7 @@ export default function Calendar() {
                         }
                     }
                 };
-                debouncedFetch(updatedStory);
+                updateStory(updatedStory);
             }
 
             if (action === 'update') {
@@ -275,13 +227,13 @@ export default function Calendar() {
                         }
                     }
                 };
-                debouncedFetch(updatedStory);
+                updateStory(updatedStory);
             }
         }
     };
 
     useEffect(() => {
-    // Bryntum Calendar instance
+        // Bryntum Calendar instance
         const calendar = calendarRef?.current?.instance;
     }, []);
 

@@ -25,7 +25,7 @@ type UpdatedStory = {
 }
 
 export default function Calendar() {
-    const { storyData, refreshStory } = useContext(StoryDataContext);
+    const { storyData, setStoryData, refreshStory, invalidateCache } = useContext(StoryDataContext);
     const currCalendarComponentIndex = storyData?.content?.body?.findIndex(
         (item) => item.hasOwnProperty('events')
     );
@@ -34,7 +34,7 @@ export default function Calendar() {
     function updateStory(updatedStory: UpdatedStory) {
         delete updatedStory.story.content._editable;
 
-        const currCalendarComponentIndex = storyData?.content?.body?.findIndex(
+        const currCalendarComponentIndex = updatedStory.story?.content?.body?.findIndex(
             (item) => item.hasOwnProperty('events')
         );
 
@@ -46,6 +46,10 @@ export default function Calendar() {
             updatedStory.story.content.body[currCalendarComponentIndex].events =
             (updatedStory.story.content.body[currCalendarComponentIndex].events as CustomEventModelType[]).map((event: CustomEventModelType) => {
                 delete event._editable;
+                // Normalize exceptionDates to prevent Bryntum errors
+                if (typeof event.exceptionDates === 'string' || event.exceptionDates === null) {
+                    event.exceptionDates = [];
+                }
                 return event;
             });
         }
@@ -56,6 +60,9 @@ export default function Calendar() {
                 return resource;
             });
         }
+        // Optimistically update the state immediately to prevent stale data
+        setStoryData(updatedStory.story);
+
         fetch('/api/update', {
             method  : 'PUT',
             headers : {
@@ -65,10 +72,13 @@ export default function Calendar() {
         })
             .then((response) => response.json())
             .then(() => {
-                refreshStory();
+                // State already updated optimistically, just invalidate cache
+                invalidateCache();
             })
             .catch((error) => {
                 console.error('Error:', error);
+                // Rollback on failure by refreshing from server
+                refreshStory();
             });
     }
 
@@ -111,8 +121,6 @@ export default function Calendar() {
                         const existingEventIndex = item.events?.findIndex(
                             (event) => event.id === eventRecord.id
                         ) ?? -1;
-
-                        if (existingEventIndex === -1) return item;
 
                         const eventData = {
                             id             : existingEventIndex >= 0 ? eventRecord.id : crypto.randomUUID(),
